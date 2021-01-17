@@ -20,6 +20,11 @@ router.get('/:title', function (req, res) {
     awaitHandlerFactory(bookController.getByTitle(req, res))
 }); // localhost:3000/api/v1/books/:book},
 
+//TODO: add auth()
+router.get('/id/:ISBN', function (req, res) {
+    awaitHandlerFactory(bookController.getByISBN(req, res))
+}); // localhost:3000/api/v1/books/id/:id},
+
 //TODO: add auth(Role.Admin), updateBookSchema(middleware)
 router.patch('/id/:id', awaitHandlerFactory(bookController.updateBook)); //
 
