@@ -10,6 +10,7 @@ dotenv.config();
  *                              Book Controller
  ******************************************************************************/
 class BookController {
+
     getAllBooks = async (req, res, next) => {
         let bookList = await BookModel.find();
         if (!bookList.length) {
@@ -30,6 +31,17 @@ class BookController {
     getByTitle = async (req, res, next) => {
         console.log(req.params.title)
         const book = await BookModel.findOne({ title: req.params.title });
+        if (!book) {
+            throw new HttpException(404, 'Book not found');
+        }
+
+        res.send(book);
+    };
+
+    getByISBN = async (req, res, next) => {
+        console.log(req.params.ISBN)
+        const book = await BookModel.findOneWithDetails({ ISBN: req.params.ISBN });
+
         if (!book) {
             throw new HttpException(404, 'Book not found');
         }
