@@ -5,10 +5,13 @@ const auth = require('../middleware/auth.middleware');
 const Role = require('../utils/userRoles.utils');
 const awaitHandlerFactory = require('../middleware/awaitHandlerFactory.middleware');
 
-// const { createUserSchema, updateUserSchema, validateLogin } = require('../middleware/validators/userValidator.middleware');
+const {createAuthorSchema, updateAuthorSchema} = require('../middleware/validators/authorValidator.middleware');
 
-router.get('/', function (req, res) {
-    awaitHandlerFactory(authorController.getAllAuthors(req, res))
-}); // localhost:3000/api/v1/authors/
+router.get('/', awaitHandlerFactory(authorController.getAllAuthors)); // localhost:3000/api/v1/authors/
+router.get('/search', awaitHandlerFactory(authorController.searchByAuthorParams)); // localhost:3000/api/v1/authors/search
+router.post('/', createAuthorSchema, auth(Role.Admin), awaitHandlerFactory(authorController.createAuthor)); // localhost:3000/api/v1/authors/
+router.patch('/id/:id', auth(Role.Admin), updateAuthorSchema, awaitHandlerFactory(authorController.updateAuthor)); // localhost:3000/api/v1/authors/id/1
+router.delete('/id/:id', auth(Role.Admin), awaitHandlerFactory(authorController.deleteAuthor)); // localhost:3000/api/v1/authors/id/1
 
 module.exports = router;
+

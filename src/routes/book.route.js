@@ -5,32 +5,16 @@ const auth = require('../middleware/auth.middleware');
 const Role = require('../utils/userRoles.utils');
 const awaitHandlerFactory = require('../middleware/awaitHandlerFactory.middleware');
 
-// const { createUserSchema, updateUserSchema, validateLogin } = require('../middleware/validators/userValidator.middleware');
-/*
-no auth for viewing all books
- */
-router.get('/',  function(req, res) {
-    awaitHandlerFactory(bookController.getAllBooks(req, res))
-}); // localhost:3000/api/v1/books/
+const {
+    createBookSchema,
+    updateBookSchema,
+} = require('../middleware/validators/bookValidator.middleware');
 
-/*
-no auth for searching by title
- */
-router.get('/:title', function (req, res) {
-    awaitHandlerFactory(bookController.getByTitle(req, res))
-}); // localhost:3000/api/v1/books/:book},
-
-//TODO: add auth()
-router.get('/id/:ISBN', function (req, res) {
-    awaitHandlerFactory(bookController.getByISBN(req, res))
-}); // localhost:3000/api/v1/books/id/:id},
-
-//TODO: add auth(Role.Admin), updateBookSchema(middleware)
-router.patch('/id/:id', awaitHandlerFactory(bookController.updateBook)); //
-
-//TODO: add auth(Role.Admin)
-router.delete('/id/:id', function (req, res) {
-    awaitHandlerFactory(bookController.deleteBook(req, res))
-}); // localhost:3000/api/v1/books/id/1},
+router.get('/', awaitHandlerFactory(bookController.getAllBooks)); // localhost:3000/api/v1/books/
+router.get('/ISBN', auth(), awaitHandlerFactory(bookController.getByISBN)); // localhost:3000/api/v1/books/ISBN
+router.get('/search', awaitHandlerFactory(bookController.searchBookByAnyParameter)); // localhost:3000/api/v1/books/search
+router.post('/', auth(Role.Admin), createBookSchema, awaitHandlerFactory(bookController.addBook)); // localhost:3000/api/v1/books/
+router.patch('/ISBN/:ISBN', auth(Role.Admin), updateBookSchema, awaitHandlerFactory(bookController.updateBook)); // localhost:3000/api/v1/books/ISBN/1234567890123
+router.delete('/ISBN/:ISBN', auth(Role.Admin), awaitHandlerFactory(bookController.deleteBook)); // localhost:3000/api/v1/books/ISBN/1234567890123
 
 module.exports = router;
