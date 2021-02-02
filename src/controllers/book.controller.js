@@ -1,6 +1,7 @@
 const BookModel = require('../models/book.model');
 const AuthorModel = require('../models/author.model');
 const HttpException = require('../utils/HttpException.utils');
+const BookMapper = require('../utils/mappers/bookMapper.mapper');
 const {validationResult} = require('express-validator');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -11,59 +12,56 @@ dotenv.config();
 class BookController {
 
     getAllBooks = async (req, res, next) => {
-        let bookList = await BookModel.find();
+        let currentPage = req.query.page
+
+        if (typeof currentPage == 'undefined'){
+            currentPage = 1;
+        }
+        let queryResult = await BookModel.find({page: currentPage});
+        let bookList = queryResult.data;
         if (!bookList.length) {
             return res.status(404).json('Cannot ' + req.method + ' ' + req.url + '. Books Not Found');
         }
-        let result = [];
-        for (let i in bookList) {
-            let book = bookList[i];
-            let authorId = book.author_id;
-            let author = await AuthorModel.findOne(authorId);
-            console.log(author)
-            result.push({
-                title: book.title,
-                image: book.image,
-                genre: book.genre,
-                description: book.description,
-                ISBN: book.ISBN,
-                author: author.first_name + " " + author.last_name
-            })
-        }
-        return res.status(200).json(result);
-    };
+        let data = [];
 
-    deleteBook = async (req, res, next) => {
-        console.log(req.params.ISBN);
-        const result = await BookModel.delete(req.params.ISBN);
-        if (!result) {
-            return res.status(404).json('Cannot ' + req.method + ' ' + req.url + '. Book Not Found');
+        for (const i in bookList) {
+            let book = bookList[i];
+            const author = await AuthorModel.findOne(book.author_id);
+            let mappedBook = BookMapper.map(author, book)
+            data.push(mappedBook)
         }
-        return res.send('Book has been deleted');
+
+        return res.send({
+            data: data,
+            current_page: currentPage
+        });
     };
 
     searchBookByAnyParameter = async (req, res, next) => {
-        console.log(req.query.search)
-        const bookList = await BookModel.findMatchingTitle({search: req.query.search});
+        let currentPage = req.query.page
+
+        if (typeof currentPage == 'undefined'){
+            currentPage = 1;
+        }
+        const queryResult = await BookModel.findMatchingTitle({search: req.query.search,  page: currentPage});
+
+        let bookList = queryResult.data;
         if (!bookList.length) {
             return res.status(404).json('Cannot ' + req.method + ' ' + req.url + '. Books Not Found');
         }
-        let result = [];
+        let data = [];
+
         for (const i in bookList) {
             let book = bookList[i];
-            console.log(book.author_id)
             const author = await AuthorModel.findOne(book.author_id);
-            result.push({
-                title: book.title,
-                image: book.image,
-                genre: book.genre,
-                description: book.description,
-                ISBN: book.ISBN,
-                author: author.first_name + " " + author.last_name
-            })
+            let mappedBook = BookMapper.map(author, book)
+            data.push(mappedBook)
         }
 
-        return res.send(result);
+        return res.send({
+            data: data,
+            current_page: currentPage
+        });
     };
 
     getByISBN = async (req, res, next) => {
@@ -104,6 +102,15 @@ class BookController {
         }
 
         return res.status(201).send('Book was added!');
+    };
+
+    deleteBook = async (req, res, next) => {
+        console.log(req.params.ISBN);
+        const result = await BookModel.delete(req.params.ISBN);
+        if (!result) {
+            return res.status(404).json('Cannot ' + req.method + ' ' + req.url + '. Book Not Found');
+        }
+        return res.send('Book has been deleted');
     };
 
     checkValidation = (req) => {

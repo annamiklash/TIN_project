@@ -1,18 +1,37 @@
 const query = require('../db/db-connection');
 const {multipleColumnSet} = require('../utils/common.utils');
+const Helper = require('../utils/helper.utils');
 
 class AuthorModel {
     tableName = 'author';
 
-    find = async (params = {}) => {
-        let sql = `SELECT * FROM ${this.tableName}`;
+    find = async (params = {page : 1}) => {
+        let page = params.page;
+        console.log(page)
+
+        // current_page  = typeof params.page !== undefined ? current_page : 1;
+        if (typeof page == 'undefined'){
+            page = 1;
+        }
+        const offset = Helper.getOffset(page, Helper.limit);
+        console.log(offset)
+        let sql = `SELECT * FROM ${this.tableName}
+                   ORDER BY first_name 
+                   LIMIT ${Helper.limit} 
+                   OFFSET ${offset}`;
 
         if (!Object.keys(params).length) {
             return await query(sql);
         }
         const {columnSet, values} = multipleColumnSet(params);
 
-        return await query(sql, [...values]);
+        const rows = await query(sql, [...values]);
+        let data = Helper.emptyOrRows(rows);
+
+        return {
+            data,
+            page
+        }
     }
 
     findOne = async (params) => {
@@ -28,13 +47,17 @@ class AuthorModel {
     }
 
     findMatching = async (params) => {
+        const offset = Helper.getOffset(params.page, Helper.limit);
         let searchParameter = params.search;
-        let sql;
+        let sql="";
 
         if (searchParameter.split(/\W+/).length === 1) {
             sql = `SELECT * FROM ${this.tableName}
             WHERE first_name LIKE '%${params.search}%' 
-            OR last_name LIKE '%${params.search}%'`;
+            OR last_name LIKE '%${params.search}%' 
+            ORDER BY first_name
+            LIMIT ${Helper.limit} 
+            OFFSET ${offset}`
         }
 
         if (searchParameter.split(/\W+/).length === 2) {
@@ -43,7 +66,10 @@ class AuthorModel {
             let last = stringArray[1];
             sql = `SELECT * FROM ${this.tableName}
             WHERE first_name LIKE '%${first}%' AND last_name LIKE '%${last}%'
-            OR first_name LIKE '%${last}%' AND last_name LIKE '%${first}%'`;
+            OR first_name LIKE '%${last}%' AND last_name LIKE '%${first}%'
+            ORDER BY first_name 
+            LIMIT ${Helper.limit} 
+            OFFSET ${offset}`
         }
 
         if (!Object.keys(params).length) {
@@ -51,7 +77,16 @@ class AuthorModel {
         }
         const {columnSet, values} = multipleColumnSet(params)
 
-        return await query(sql, [...values]);
+        const rows = await query(sql, [...values]);
+        let data = Helper.emptyOrRows(rows);
+
+        console.log(data)
+        const page = params.page;
+
+        return {
+            data,
+            page
+        }
 
     }
 

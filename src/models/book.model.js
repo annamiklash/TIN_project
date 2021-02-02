@@ -1,21 +1,38 @@
 const query = require('../db/db-connection');
 const {multipleColumnSet} = require('../utils/common.utils');
+const Helper = require('../utils/helper.utils');
 const User = require('./user.model');
 const Author = require('./author.model');
 
 class BookModel {
     tableName = 'book';
 
-    find = async (params = {}) => {
-        let sql = `SELECT * FROM ${this.tableName}`;
+    find = async (params = {page: 1}) => {
+
+        const offset = Helper.getOffset(params.page, Helper.limit);
+
+        let sql = `SELECT * FROM ${this.tableName} 
+                   ORDER BY title 
+                   LIMIT ${Helper.limit} 
+                   OFFSET ${offset} `;
 
         if (!Object.keys(params).length) {
             return await query(sql);
         }
         const {columnSet, values} = multipleColumnSet(params)
 
-        return await query(sql, [...values]);
+        const rows = await query(sql, [...values]);
+        let data = Helper.emptyOrRows(rows);
+
+        console.log(data)
+        const page = params.page;
+
+        return {
+            data,
+            page
+        }
     }
+
 
     findOne = async (params) => {
         const {columnSet, values} = multipleColumnSet(params)
@@ -29,11 +46,10 @@ class BookModel {
     }
 
     findBooksByAuthorId = async (id) => {
-        console.log(id)
-
         const sql = `SELECT title, genre, image, ISBN, description
          FROM ${this.tableName}
-         WHERE author_id = ${id}`;
+         WHERE author_id = ${id}
+         ORDER BY title`;
 
         if (!Object.keys(id).length) {
             return await query(sql);
@@ -46,20 +62,28 @@ class BookModel {
     }
 
     findMatchingTitle = async (params) => {
-
-        console.log(params)
-        console.log(params.search)
-
+        const offset = Helper.getOffset(params.page, Helper.limit);
         const sql = `SELECT * FROM ${this.tableName}
-        WHERE title LIKE '%${params.search}%'`;
+        WHERE title LIKE '%${params.search}%'
+         ORDER BY title 
+         LIMIT ${Helper.limit} 
+         OFFSET ${offset}`;
 
         if (!Object.keys(params).length) {
             return await query(sql);
         }
         const {columnSet, values} = multipleColumnSet(params)
 
-        const result = await query(sql, [...values]);
-        return result;
+        const rows = await query(sql, [...values]);
+        let data = Helper.emptyOrRows(rows);
+
+        console.log(data)
+        const page = params.page;
+
+        return {
+            data,
+            page
+        }
 
     }
 
@@ -104,6 +128,8 @@ class BookModel {
 
     }
 
+
+
     delete = async (id) => {
         const sql = `DELETE FROM ${this.tableName}
         WHERE ISBN = ?`;
@@ -133,6 +159,7 @@ class BookModel {
 
         return affectedRows;
     }
+
 }
 
 module.exports = new BookModel;

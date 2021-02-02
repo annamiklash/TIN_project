@@ -1,6 +1,7 @@
 const AuthorModel = require('../models/author.model');
 const BookModel = require('../models/book.model');
 const HttpException = require('../utils/HttpException.utils');
+const AuthorMapper = require('../utils/mappers/authorMapper.mapper');
 const {validationResult} = require('express-validator');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -11,52 +12,54 @@ dotenv.config();
 class AuthorController {
 
     getAllAuthors = async (req, res, next) => {
-        let authorsList = await AuthorModel.find();
-        if (!authorsList.length) {
-            return res.status(404).json('Cannot ' + req.method + ' ' + req.url);
+        let currentPage = req.query.page
+
+        if (typeof currentPage == 'undefined'){
+            currentPage = 1;
         }
-        let result = [];
+        let queryResult = await AuthorModel.find({page: currentPage});
+        let authorsList = queryResult.data;
+        if (!authorsList.length) {
+            return res.status(404).json('Cannot ' + req.method + ' ' + req.url+ '. Authors Not Found');
+        }
+        let data = []
+
         for (const i in authorsList) {
             let author = authorsList[i]
             let authorBooksList = await BookModel.findBooksByAuthorId(author.id);
+            let authorWithBookList = AuthorMapper.map(author, authorBooksList)
+            data.push(authorWithBookList);
 
-            let authorWithBookList = {
-                image: author.image,
-                name: author.first_name + " " + author.last_name,
-                nationality: author.nationality,
-                born: author.birth_date,
-                died: author.death_date,
-                books: authorBooksList
-            }
-
-            result.push(authorWithBookList);
         }
-        return res.status(200).json(result);
+        return res.send({
+            data: data,
+            current_page: currentPage
+        });
     };
 
-    searchByAuthorParams = async (req, res, next) => {
 
-        const authorList = await AuthorModel.findMatching({search: req.query.search});
-        if (!authorList.length) {
+    searchByAuthorParams = async (req, res, next) => {
+        const queryResult = await AuthorModel.findMatching({search: req.query.search, page: req.query.page});
+        let authorsList = queryResult.data;
+
+        if (!authorsList.length) {
             return res.status(404).json('Cannot ' + req.method + ' ' + req.url);
 
         }
-        console.log(authorList)
-        var result = [];
-        for (const i in authorList) {
-            let author = authorList[i];
-            let authorBooksList = await BookModel.findBooksByAuthorId(author.id);
-            result.push({
-                image: author.image,
-                name: author.first_name + " " + author.last_name,
-                nationality: author.nationality,
-                born: author.birth_date,
-                died: author.death_date,
-                books: authorBooksList
-            })
-        }
+        let data = [];
+        let currentPage = queryResult.page;
 
-        return res.status(200).json(result);
+        for (const i in authorsList) {
+            let author = authorsList[i]
+            let authorBooksList = await BookModel.findBooksByAuthorId(author.id);
+            let authorWithBookList = AuthorMapper.map(author, authorBooksList)
+            data.push(authorWithBookList);
+
+        }
+        return res.send({
+            data: data,
+            current_page: currentPage
+        });
     };
 
     createAuthor = async (req, res, next) => {
