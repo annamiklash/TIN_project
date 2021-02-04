@@ -46,6 +46,18 @@ class AuthorModel {
         return result[0];
     }
 
+    findOneById = async (params) => {
+        let authorId = params.id;
+        const {columnSet, values} = multipleColumnSet(params)
+
+        const sql = `SELECT * FROM ${this.tableName}
+        WHERE id = ${authorId}`;
+
+        const result = await query(sql, [...values]);
+
+        return result[0];
+    }
+
     findMatching = async (params) => {
         const offset = Helper.getOffset(params.page, Helper.limit);
         let searchParameter = params.search;

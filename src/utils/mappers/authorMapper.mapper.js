@@ -1,5 +1,6 @@
 function map(author, authorBooksList) {
-    var newAuthor =  {
+    return  {
+        author_id: author.id,
         name: author.first_name + " " + author.last_name,
         image: author.image,
         nationality: author.nationality,
@@ -7,9 +8,7 @@ function map(author, authorBooksList) {
         died: author.death_date,
         books: authorBooksList
     };
-    return {
-        author : newAuthor
-    };
+
 }
 
 module.exports = { map}

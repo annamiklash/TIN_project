@@ -38,7 +38,7 @@ class BookModel {
         const {columnSet, values} = multipleColumnSet(params)
 
         const sql = `SELECT * FROM ${this.tableName}
-        WHERE ${columnSet}`;
+        WHERE ISBN = '${params.ISBN}'`;
 
         const result = await query(sql, [...values]);
 

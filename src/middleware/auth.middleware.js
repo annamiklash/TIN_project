@@ -10,11 +10,20 @@ const auth = (...roles) => {
             const authHeader = req.headers.authorization;
             const bearer = 'Bearer ';
 
+            var token = ''
+
             if (!authHeader || !authHeader.startsWith(bearer)) {
-                throw new HttpException(401, 'Access denied. No credentials sent!');
+                let cookie = req.cookies.auth_cookie;
+                if (cookie === undefined) {
+                   throw new HttpException(401, 'Access denied. No credentials sent!');
+                }
+
+                token = cookie;
+
+            } else {
+                token = authHeader.replace(bearer, '');
             }
 
-            const token = authHeader.replace(bearer, '');
             const secretKey = process.env.SECRET_JWT || "";
 
             // Verify Token

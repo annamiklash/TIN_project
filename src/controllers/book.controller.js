@@ -72,7 +72,7 @@ class BookController {
             return res.status(404).json('Cannot ' + req.method + ' ' + req.url + '. Book Not Found');
         }
 
-        res.send(book);
+        return res.send(book);
     };
 
     updateBook = async (req, res, next) => {

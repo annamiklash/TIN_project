@@ -134,8 +134,7 @@ class UserController {
             return res.status(401).json('Unable To Login');
         }
 
-        // const isMatch = await bcrypt.compare(pass, user.password); //UNCOMMENT IF LOGGING IN WITH HASHED PASSWORD
-         const isMatch = pass === user.password;
+        const isMatch = await bcrypt.compare(pass, user.password); //UNCOMMENT IF LOGGING IN WITH HASHED PASSWORD
 
         if (!isMatch) {
             return res.status(401).json('Incorrect Password');
@@ -146,16 +145,29 @@ class UserController {
             expiresIn: '24h'
         });
 
+        res.cookie('auth_cookie', token, {maxAge: 86400000});
+        console.log('cookie created successfully');
+
         const {password, ...userWithoutPassword} = user;
 
         return res.send({...userWithoutPassword, token});
     };
 
+    userLogout = async (req, res, next) => {
+        let cookie = req.cookies.auth_cookie;
+        if (cookie !== undefined) {
+            res.clearCookie("auth_cookie");
+        }
+
+        console.log("logout success")
+        return res.status(200).json('Logout complete');
+    }
+
     checkValidation = (req) => {
         const errors = validationResult(req)
-        console.log(req)
+        console.log(errors)
         if (!errors.isEmpty()) {
-            throw new HttpException(400, 'Validation faild', errors);
+            throw new HttpException(400, 'Validation failed', errors);
         }
     }
 

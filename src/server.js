@@ -5,11 +5,12 @@ const errorMiddleware = require('./middleware/error.middleware');
 const userRouter = require('./routes/user.route');
 const bookRouter = require('./routes/book.route');
 const authorRouter = require('./routes/author.route');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 dotenv.config();
 app.use(express.json());
-
+app.use(cookieParser());
 
 app.use(function (req, res, next) {
 
@@ -22,9 +23,18 @@ app.use(function (req, res, next) {
 
 const port = Number(process.env.PORT || 3331);
 
+
+app.use(express.static(__dirname + '/static'));
+
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/static/html/login.html');
+});
+
+
 app.use(`/api/v1/users`, userRouter);
 app.use(`/api/v1/books`, bookRouter);
 app.use(`/api/v1/authors`, authorRouter);
+
 
 app.all('*', (req, res, next) => {
     const err = new HttpException(404, 'Endpoint Not Found');

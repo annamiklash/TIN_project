@@ -14,13 +14,13 @@ class AuthorController {
     getAllAuthors = async (req, res, next) => {
         let currentPage = req.query.page
 
-        if (typeof currentPage == 'undefined'){
+        if (typeof currentPage == 'undefined') {
             currentPage = 1;
         }
         let queryResult = await AuthorModel.find({page: currentPage});
         let authorsList = queryResult.data;
         if (!authorsList.length) {
-            return res.status(404).json('Cannot ' + req.method + ' ' + req.url+ '. Authors Not Found');
+            return res.status(404).json('Cannot ' + req.method + ' ' + req.url + '. Authors Not Found');
         }
         let data = []
 
@@ -36,6 +36,19 @@ class AuthorController {
             current_page: currentPage
         });
     };
+
+    getAuthorById = async (req, res, nex) => {
+        console.log(req.query.id)
+        const author = await AuthorModel.findOneById({id: req.query.id});
+
+        if (!author) {
+            return res.status(404).json('Cannot ' + req.method + ' ' + req.url + '. Author Not Found');
+        }
+        let authorBooks = await BookModel.findBooksByAuthorId(req.query.id);
+
+
+        return res.send({author, authorBooks});
+    }
 
 
     searchByAuthorParams = async (req, res, next) => {

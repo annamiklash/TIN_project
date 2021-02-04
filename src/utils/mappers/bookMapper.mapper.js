@@ -1,16 +1,14 @@
 function map(author, book) {
-    var newBook = {
+    return  {
         title: book.title,
         image: book.image,
         genre: book.genre,
         description: book.description,
         ISBN: book.ISBN,
-        author: author.first_name + " " + author.last_name
+        author: author.first_name + " " + author.last_name,
+        author_id: author.id
     }
 
-   return  {
-        book : newBook
-   };
 }
 
 module.exports = { map}
