@@ -23,9 +23,14 @@ function submitLogin() {
         contentType: 'application/json',
         data: json,
         success: function (resp) {
-
-            redirectToUserSide();
-
+            let role = resp.role;
+            if (role === 'SuperUser') {
+                redirectToUserSide();
+            } else if (role === 'Admin') {
+                redirectToAdminSide()
+            } else {
+                alert("Unknown user role " + role);
+            }
         },
         error: function (jqXhr, textStatus, errorThrown) {
             alert(jqXhr.responseJSON.message);
@@ -46,9 +51,24 @@ function redirectToUserSide() {
         }
     });
 }
+
 function redirectToGuestSide() {
 
     $.ajax("html/guest_side.html", {
+        type: 'GET',
+        contentType: 'text/html; charset=UTF-8',
+        success: function (resp) {
+            $('#main_div').html(resp);
+        },
+        error: function (jqXhr, textStatus, errorThrown) {
+            alert(errorThrown);
+        }
+    });
+}
+
+function redirectToAdminSide() {
+
+    $.ajax("html/admin_side.html", {
         type: 'GET',
         contentType: 'text/html; charset=UTF-8',
         success: function (resp) {
@@ -97,7 +117,7 @@ function buildErrorsListHtml(errors) {
     html += '<ul>';
 
     errors.forEach((error) => {
-        html += '<li>' +error.param + ': ' + error.msg + '</li>'
+        html += '<li>' + error.param + ': ' + error.msg + '</li>'
     });
 
     html += '</ul>';

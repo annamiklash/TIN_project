@@ -56,7 +56,7 @@ exports.updateBookSchema = [
         .withMessage('Must be maximum 50 chars long'),
     check('description')
         .optional()
-        .isLength({max: 50})
+        .isLength({max: 500})
         .withMessage("Must be maximum 500 chars long"),
     body()
         .custom(value => {

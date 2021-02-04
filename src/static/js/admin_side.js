@@ -1,0 +1,3 @@
+$(function () {
+    loadAllBooks(1)
+});
