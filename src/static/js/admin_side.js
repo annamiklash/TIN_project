@@ -1,3 +1,3 @@
 $(function () {
-    loadAllBooks(1)
+    manageUsers();
 });

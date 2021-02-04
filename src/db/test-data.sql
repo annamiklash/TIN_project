@@ -1,11 +1,11 @@
 insert into user (first_name, last_name, birth_date, username, email, password, role)
-values ('hanna', 'miklash', '1994-06-22', 'mimimiklash', 'anna@gmail.com', 'abc123', 'SuperUser');
+values ('hanna', 'miklash', '1994-06-22', 'mimimiklash', 'anna@gmail.com', '$2a$08$GRJdxOyoqSa1nqv9jgIpzeyEdhmmolieprjYJuz2Kx7YU60Tn0FoW', 'SuperUser');
 
 insert into user (first_name, last_name, birth_date, username, email, password, role)
 values ('maksim', 'andrzejewski', '1994-05-27', 'jakobian', 'maks@gmail.com', '123abc', 'SuperUser');
 
 insert into user (first_name, last_name, birth_date, username, email, password, role)
-values ('admin', 'admin', curdate(), 'admin', 'admin@gmail.com', '123admin', 'Admin');
+values ('admin', 'admin', curdate(), 'admin', 'admin@gmail.com', '$2a$08$GRJdxOyoqSa1nqv9jgIpzeyEdhmmolieprjYJuz2Kx7YU60Tn0FoW', 'Admin');
 
 
 insert into author( first_name, last_name, birth_date, death_date, nationality, image)

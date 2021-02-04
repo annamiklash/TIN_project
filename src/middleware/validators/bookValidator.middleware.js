@@ -23,7 +23,6 @@ exports.createBookSchema = [
         .isNumeric(),
     check('genre')
         .exists()
-        .isAlpha()
         .withMessage("Should contain only letters")
         .isLength({max : 50})
         .withMessage('Must be maximum 50 chars long'),
@@ -35,23 +34,28 @@ exports.createBookSchema = [
 
 exports.updateBookSchema = [
     check('title')
-        .optional()
+        .exists()
+        .withMessage('title is required')
         .isLength({ min: 1 })
         .withMessage('Must be at least 1 character long'),
     check('ISBN')
-        .optional()
+        .exists()
+        .withMessage('ISBN is required')
         .isLength({ min: 13, max : 13 })
         .matches(/^(\d{13})$/)
         .withMessage('Must be 13 digits long'),
     check('image')
-        .optional()
+        .exists()
+        .withMessage('Image link is required')
         .isLength({ max: 500 })
         .withMessage('Must be maximum 500 chars long'),
     check('author_id')
-        .optional()
+        .exists()
+        .withMessage('Author Id required')
         .isNumeric(),
     check('genre')
-        .optional()
+        .exists()
+        .withMessage("Should contain only letters")
         .isLength({max : 50})
         .withMessage('Must be maximum 50 chars long'),
     check('description')

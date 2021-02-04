@@ -1,21 +1,39 @@
 const query = require('../db/db-connection');
 const {multipleColumnSet} = require('../utils/common.utils');
 const Role = require('../utils/userRoles.utils');
+const Helper = require('../utils/helper.utils');
+
 
 class UserModel {
     tableName = 'user';
 
-    find = async (params = {}) => {
-        let sql = `SELECT * FROM ${this.tableName}`;
+    find = async (params = {page: 1}) => {
+        let page = params.page;
+        console.log(page)
+
+        if (typeof page == 'undefined') {
+            page = 1;
+        }
+        const offset = Helper.getOffset(page, Helper.limit);
+
+        let sql = `SELECT * FROM ${this.tableName}
+                   ORDER BY first_name 
+                   LIMIT ${Helper.limit} 
+                   OFFSET ${offset}`;
 
         if (!Object.keys(params).length) {
             return await query(sql);
         }
 
         const {columnSet, values} = multipleColumnSet(params)
-        sql += ` WHERE ${columnSet}`;
 
-        return await query(sql, [...values]);
+        const rows = await query(sql, [...values]);
+        let data = Helper.emptyOrRows(rows);
+
+        return {
+            data,
+            page
+        }
     }
 
     findOne = async (params) => {
@@ -23,6 +41,17 @@ class UserModel {
 
         const sql = `SELECT * FROM ${this.tableName}
         WHERE ${columnSet}`;
+
+        const result = await query(sql, [...values]);
+
+        return result[0];
+    }
+
+    findOneById = async (params) => {
+        console.log(params.id)
+        const {columnSet, values} = multipleColumnSet(params)
+        const sql = `SELECT * FROM ${this.tableName}
+        WHERE id =  ${params.id}`;
 
         const result = await query(sql, [...values]);
 

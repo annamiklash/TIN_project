@@ -12,9 +12,16 @@ dotenv.config();
  ******************************************************************************/
 class UserController {
     getAllUsers = async (req, res, next) => {
-        let userList = await UserModel.find();
+        let currentPage = req.query.page
+
+        if (typeof currentPage == 'undefined') {
+            currentPage = 1;
+        }
+
+        let queryResult = await UserModel.find({page: currentPage});
+        let userList = queryResult.data;
         if (!userList.length) {
-            return res.status(404).json('User Not Found');
+            return res.status(404).json('Users Not Found');
         }
 
         userList = userList.map(user => {
@@ -22,13 +29,27 @@ class UserController {
             return userWithoutPassword;
         });
 
-        return res.send(userList);
+        return res.send({
+            data: userList,
+            current_page: currentPage
+        });
     };
 
     getCurrentUser = async (req, res, next) => {
         const {password, ...userWithoutPassword} = req.currentUser;
 
         return res.send(userWithoutPassword);
+    };
+
+    getUserById = async (req, res, next) => {
+        console.log(req.query.id)
+        const user = await UserModel.findOneById({id: req.query.id});
+
+        if (!user) {
+            return res.status(404).json('Cannot ' + req.method + ' ' + req.url + '. User Not Found');
+        }
+
+        return res.send(user);
     };
 
     getUserLibrary = async (req, res, next) => {

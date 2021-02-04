@@ -18,17 +18,12 @@ function showBookInfo(ISBN) {
 }
 
 function buildHtmlForBook(book) {
-    return `<div class="column">
-    <div class="card">
-    <div class="container">
-     <p> <img src="` + book.image + `" style="max-width: 200px"></p>
-      
-        <h2>` + book.title + `</h2>
-        <p class="title">` + book.author_id + `</p>
-        <p>` + book.description + `</p>
-        <p>` + book.genre + `</p>
-        <p id="book_ISBN">` + book.ISBN + `</p>
-        <p> <div class="bookfunc"> 
+
+    let cookie = document.cookie
+    let bookOperations = ""
+    if (cookie.startsWith("auth_cookie")) {
+        bookOperations = `
+      <p> <div class="bookfunc"> 
                         <div class="dropdown"> 
                             <button class="dropbtn">Add To Library</button> 
                             <div class="dropdown-content"> 
@@ -39,6 +34,21 @@ function buildHtmlForBook(book) {
                             </div> 
                         </div> 
                     </div> </p>
+      `
+    }
+
+
+    return `<div class="column">
+    <div class="card">
+    <div class="container">
+     <p> <img src="` + book.image + `" style="max-width: 200px"></p>
+      
+        <h2>` + book.title + `</h2>
+        <p class="title">` + book.author_id + `</p>
+        <p>` + book.description + `</p>
+        <p>` + book.genre + `</p>
+        <p id="book_ISBN">` + book.ISBN + `</p>
+        ` + bookOperations + `
       </div>
     </div>
   </div>`
