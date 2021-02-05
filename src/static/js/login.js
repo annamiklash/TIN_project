@@ -87,6 +87,7 @@ function signUp() {
     let email = $('#create_email_input').val();
     let password = $('#create_password_input').val();
     let birthdate = $('#create_birthday_input').val();
+    console.log(birthdate)
 
     let myObject = new Object();
     myObject.first_name = first_name;

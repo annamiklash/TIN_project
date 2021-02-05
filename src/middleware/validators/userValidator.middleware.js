@@ -39,7 +39,7 @@ exports.createUserSchema = [
         .withMessage('Password must contain at least 6 characters')
         .isLength({max: 10})
         .withMessage('Password can contain max 10 characters'),
-    check('birth_date')
+    check('birthdate')
         .exists()
         .withMessage('birthdate is required')
         .matches(/^([0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01]))$/)
