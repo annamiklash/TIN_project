@@ -15,9 +15,12 @@
 
 </head>
 <body>
+<div id="books_authors_button">
+    <button class="login_style_buttons" id="get_all_books_button" type="button" onclick="loadAllBooks(1)">Books</button>
+    <div class="divider"></div>
+    <button class="login_style_buttons" id="get_all_authors_button" type="button" onclick="loadAllAuthors(1)">Authors</button>
+</div>
 
-<button type="button" onclick="loadAllBooks(1)">Books</button>
-<button type="button" onclick="loadAllAuthors(1)">Authors</button>
 <button type="button" id="logout_button" onclick="logout()">Go to login</button>
 
 <div id="data_table_div">

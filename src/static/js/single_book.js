@@ -18,7 +18,6 @@ function showBookInfo(ISBN) {
 }
 
 function buildHtmlForBook(book) {
-
     let cookie = document.cookie
     let bookOperations = ""
     if (cookie.startsWith("auth_cookie")) {

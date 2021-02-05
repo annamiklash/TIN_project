@@ -36,7 +36,7 @@
     box-sizing: border-box;
     font-size: 14px;
 }
-.form #login {
+.form #login,.form #guest_button {
     font-family: "Roboto", sans-serif;
     text-transform: uppercase;
     outline: 0;
@@ -50,7 +50,7 @@
     transition: all 0.3 ease;
     cursor: pointer;
 }
-.form #login:hover,.form #login:active,.form #login:focus {
+.form #login:hover,.form #login:active,.form #login:focus,.form #guest_button:hover{
     background: #43A047;
 }
 

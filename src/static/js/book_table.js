@@ -80,11 +80,11 @@ function buildTableHtmlFromJsonArray(resp) {
 }
 
 function buildPaginationFooter(currentPage) {
-    return '<div class="pagination">' +
-        '<button  onclick="onPrevPageButtonClick()">&laquo;</button>' +
+    return '<footer><div class="pagination">' +
+        '<button class="page_button" onclick="onPrevPageButtonClick()">&laquo;</button>' +
         '<strong id="current_page">' + currentPage + '</strong>' +
-        '<button onclick="onNextPageButtonClick()">&raquo;</button>' +
-        '</div>'
+        '<button class="page_button" onclick="onNextPageButtonClick()">&raquo;</button>' +
+        '</div></footer>'
 }
 
 function onPrevPageButtonClick() {
